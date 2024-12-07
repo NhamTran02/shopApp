@@ -8,16 +8,20 @@ import com.example.shopapp.exceptions.InvalidParamException;
 import com.example.shopapp.model.Category;
 import com.example.shopapp.model.Product;
 import com.example.shopapp.model.ProductImage;
-import com.example.shopapp.repositories.CategoryRepository;
-import com.example.shopapp.repositories.ProductImageRepository;
-import com.example.shopapp.repositories.ProductRepository;
+import com.example.shopapp.repository.CategoryRepository;
+import com.example.shopapp.repository.ProductImageRepository;
+import com.example.shopapp.repository.ProductRepository;
+import com.example.shopapp.repository.specification.ProductSpecification;
 import com.example.shopapp.services.impl.ProductServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -92,6 +96,7 @@ public class ProductService implements ProductServiceImpl {
         return productRepository.existsByName(name);
     }
 
+
     @PreAuthorize("hasAuthority('ADMIN')")
     @Override
     public ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws DataNotFountException, InvalidParamException {
@@ -108,4 +113,26 @@ public class ProductService implements ProductServiceImpl {
         }
         return productImageRepository.save(newProductImage);
     }
+
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
+    @Override
+    public Page<ProductResponse> searchProductsByPriceRange(String name,BigDecimal minPrice, BigDecimal maxPrice, PageRequest pageRequest) {
+        Specification<Product> spec= Specification.where(null);
+        try{
+            if (StringUtils.hasLength(name)){
+                spec=spec.and(ProductSpecification.hasName(name));
+            }
+            if (minPrice != null) {
+                spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice));
+            }
+
+            if (maxPrice != null) {
+                spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return productRepository.findAll(spec,pageRequest).map(ProductResponse::fromProduct);
+    }
+
 }

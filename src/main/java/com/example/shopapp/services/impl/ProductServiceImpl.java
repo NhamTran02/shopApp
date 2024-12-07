@@ -10,6 +10,8 @@ import com.example.shopapp.model.ProductImage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.math.BigDecimal;
+
 public interface ProductServiceImpl {
     public Product createProduct(ProductDTO productDTO) throws DataNotFountException;
     Product getProductById(Long id) throws DataNotFountException;
@@ -17,6 +19,7 @@ public interface ProductServiceImpl {
     Product update(Long id, ProductDTO productDTO) throws DataNotFountException;
     void deleteProduct(Long id) throws DataNotFountException;
     boolean existsName(String name);
+    Page<ProductResponse> searchProductsByPriceRange(String name,BigDecimal minPrice, BigDecimal maxPrice, PageRequest pageRequest);
 
     ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws DataNotFountException, InvalidParamException;
 }

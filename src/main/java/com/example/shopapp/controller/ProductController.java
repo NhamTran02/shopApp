@@ -17,7 +17,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -187,4 +187,30 @@ public class ProductController {
         }
         return ResponseEntity.ok().body("generateFakeProducts");
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchProductsByPriceRange(
+            @RequestParam("name") String name,
+            @RequestParam(value = "minPrice",required = false) BigDecimal min,
+            @RequestParam(value = "maxPrice",required = false) BigDecimal max,
+            @RequestParam(value = "page",defaultValue = "1") int page,
+            @RequestParam(value = "limit",defaultValue = "10") int limit
+            ){
+        try {
+            PageRequest pageRequest = PageRequest.of(page-1,limit,Sort.by("id").ascending());
+            Page<ProductResponse> productPage=productService.searchProductsByPriceRange(name,min,max,pageRequest);
+            List<ProductResponse> productResponses=productPage.getContent();
+            return ResponseEntity.ok().body(ProductListResponse.builder()
+                            .products(productResponses)
+                            .totalPages(productPage.getTotalPages())
+                            .totalElements(productPage.getNumberOfElements())
+                            .currentPage(page)
+                    .build()
+            );
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

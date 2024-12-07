@@ -1,4 +1,4 @@
-package com.example.shopapp.repositories;
+package com.example.shopapp.repository;
 
 import com.example.shopapp.model.Category;
 import org.springframework.data.jpa.repository.JpaRepository;

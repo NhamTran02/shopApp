@@ -1,6 +1,6 @@
 package com.example.shopapp.configurations;
 
-import com.example.shopapp.repositories.UserRepository;
+import com.example.shopapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

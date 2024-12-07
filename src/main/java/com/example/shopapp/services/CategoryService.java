@@ -2,7 +2,7 @@ package com.example.shopapp.services;
 
 import com.example.shopapp.DTO.CategoryDTO;
 import com.example.shopapp.model.Category;
-import com.example.shopapp.repositories.CategoryRepository;
+import com.example.shopapp.repository.CategoryRepository;
 import com.example.shopapp.services.impl.CategoryServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

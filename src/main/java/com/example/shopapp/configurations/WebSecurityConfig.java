@@ -1,7 +1,6 @@
 package com.example.shopapp.configurations;
 
 import com.example.shopapp.filter.JwtTokenFilter;
-import com.example.shopapp.model.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
