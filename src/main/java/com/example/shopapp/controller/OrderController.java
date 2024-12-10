@@ -34,8 +34,8 @@ public class OrderController {
                         .toList();
                 return ResponseEntity.badRequest().body(errors);
             }
-            OrderResponse orderResponse=orderServiceImpl.createOrder(orderDTO);
-            return ResponseEntity.ok().body(orderResponse);
+            Order order=orderServiceImpl.createOrder(orderDTO);
+            return ResponseEntity.ok().body(order);
         }
         catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -72,7 +72,8 @@ public class OrderController {
     public ResponseEntity<?> getOrder(@Valid @PathVariable("id") Long OrderId) {
         try {
             Order existingOrder =orderServiceImpl.getOrder(OrderId);
-            return ResponseEntity.ok().body(existingOrder);
+            OrderResponse orderResponse=OrderResponse.from(existingOrder);
+            return ResponseEntity.ok().body(orderResponse);
         }
         catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -14,6 +14,7 @@ import com.example.shopapp.repository.ProductRepository;
 import com.example.shopapp.repository.specification.ProductSpecification;
 import com.example.shopapp.services.impl.ProductServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;

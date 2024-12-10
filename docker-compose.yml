@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:latest
+    container_name: redis-container
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - shopapp-network
+
+  app:
+    build: src/main/java
+    ports:
+      - "8088:8088"
+    depends_on:
+      - redis
+    environment:
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+    networks:
+      - shopapp-network
+
+volumes:
+  redis-data:
+
+networks:
+  shopapp-network:
+    driver: bridge
+
+# docker compose -f ./docker-compose.yml up -d redis

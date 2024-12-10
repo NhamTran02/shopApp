@@ -1,16 +1,13 @@
 package com.example.shopapp.Responses;
 
+import com.example.shopapp.model.Order;
+import com.example.shopapp.model.OrderDetail;
 import com.example.shopapp.model.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -35,7 +32,7 @@ public class OrderResponse {
     private String note;
 
     @JsonProperty("order_date")
-    private LocalDate orderDate;
+    private Date orderDate;
 
     private String status;
 
@@ -57,6 +54,27 @@ public class OrderResponse {
     @JsonProperty("payment_method")
     private String paymentMethod;
 
-    @JsonProperty("active")
-    private Boolean active;
+    @JsonProperty("order_details")
+    private List<OrderDetail> orderDetails;
+
+    public static OrderResponse from(Order order) {
+        OrderResponse orderResponse = OrderResponse.builder()
+                .id(order.getId())
+                .user(order.getUser())
+                .fullname(order.getFullname())
+                .phoneNumber(order.getPhoneNumber())
+                .address(order.getAddress())
+                .note(order.getNote())
+                .orderDate(order.getOrderDate())
+                .status(order.getStatus())
+                .totalMoney(order.getTotalMoney())
+                .shippingMethod(order.getShippingMethod())
+                .shippingAddress(order.getShippingAddress())
+                .shippingDate(order.getShippingDate())
+                .trackingNumber(order.getTrackingNumber())
+                .paymentMethod(order.getPaymentMethod())
+                .orderDetails(order.getOrderDetails())
+                .build();
+        return orderResponse;
+    }
 }
