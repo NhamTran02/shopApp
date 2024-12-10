@@ -9,6 +9,7 @@ import com.example.shopapp.model.User;
 import com.example.shopapp.repository.RoleRepository;
 import com.example.shopapp.repository.UserRepository;
 import com.example.shopapp.services.impl.UserServiceImpl;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -105,4 +106,53 @@ public class UserService implements UserServiceImpl {
             throw new DataNotFountException("User not found");
         }
     }
+
+    @Transactional
+    @Override
+    public User updateUser(Long userId, UserDTO userDTO) throws Exception {
+        // Tìm User dựa trên userId
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFountException("User not found"));
+
+        // Kiểm tra nếu số điện thoại đã tồn tại và không thuộc về user hiện tại
+        String phoneNumber = userDTO.getPhoneNumber();
+        Optional<User> userWithPhoneNumber = userRepository.findByPhoneNumber(phoneNumber);
+        if (userWithPhoneNumber.isPresent() && !userWithPhoneNumber.get().getId().equals(userId)) {
+            throw new DataIntegrityViolationException("Phone number already exists");
+        }
+
+        // Kiểm tra role mới (nếu có)
+        if (userDTO.getRoleId() != null) {
+            Role role = roleRepository.findById(userDTO.getRoleId())
+                    .orElseThrow(() -> new DataNotFountException("Role not found"));
+            if (role.getName().toUpperCase().equals("ADMIN")) {
+                throw new PermissionDenyException("You cannot assign the ADMIN role");
+            }
+            existingUser.setRole(role);
+        }
+
+        // Cập nhật thông tin User
+        existingUser.setFullName(userDTO.getFullName() != null ? userDTO.getFullName() : existingUser.getFullName());
+        existingUser.setPhoneNumber(userDTO.getPhoneNumber() != null ? userDTO.getPhoneNumber() : existingUser.getPhoneNumber());
+        existingUser.setAddress(userDTO.getAddress() != null ? userDTO.getAddress() : existingUser.getAddress());
+        existingUser.setDateOfBirth(userDTO.getDateOfBirth() != null ? userDTO.getDateOfBirth() : existingUser.getDateOfBirth());
+        existingUser.setFacebookAccountId(userDTO.getFacebookAccountId() != null ? userDTO.getFacebookAccountId() : existingUser.getFacebookAccountId());
+        existingUser.setGoogleAccountId(userDTO.getGoogleAccountId() != null ? userDTO.getGoogleAccountId() : existingUser.getGoogleAccountId());
+
+        // Cập nhật mật khẩu nếu người dùng cung cấp
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        }
+
+        // Kiểm tra nếu có accountId() thì không yêu cầu password
+        if ((userDTO.getFacebookAccountId() == null || userDTO.getFacebookAccountId().isEmpty())
+                && (userDTO.getGoogleAccountId() == null || userDTO.getGoogleAccountId().isEmpty())
+                && (userDTO.getPassword() == null || userDTO.getPassword().isEmpty())) {
+            throw new RuntimeException("Password is required if no social account is provided");
+        }
+
+        // Lưu user đã được cập nhật
+        return userRepository.save(existingUser);
+    }
+
 }

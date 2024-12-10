@@ -64,12 +64,33 @@ public class UserController {
     }
 
     @PostMapping("/details")
-    public ResponseEntity<?> getUserDetails(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getUserDetails(@RequestHeader("Authorization") String authorizationHeader) {
         try {
-            String extractedToken = token.substring(7);
+            String extractedToken = authorizationHeader.substring(7);
             User user=userService.getUserDetailsFromToken(extractedToken);
             return ResponseEntity.ok(UserResponse.fromUser(user));
 
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/details/{userId}")
+    public ResponseEntity<?> updateUserDetails(
+            @PathVariable Long userId,
+            @RequestBody UserDTO userDTO,
+            @RequestHeader("Authorization") String authorizationHeader
+    ){
+        try {
+            String extractedToken = authorizationHeader.substring(7);
+            User user=userService.getUserDetailsFromToken(extractedToken);
+
+            if (user.getId() != userId) {
+                return ResponseEntity.status(403).build();
+            }
+
+            User updateUser=userService.updateUser(userId, userDTO);
+            return ResponseEntity.ok(UserResponse.fromUser(updateUser));
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
