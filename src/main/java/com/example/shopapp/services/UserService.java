@@ -83,9 +83,26 @@ public class UserService implements UserServiceImpl {
                 throw new BadCredentialsException("Invalid password");
             }
         }
-
+        if (!optionalUser.get().getActive()){
+            throw new DataNotFountException("User not active");
+        }
         //authenticate with Java spring security
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(phoneNumber, password,user.getAuthorities()));
         return jwtTokenUtil.generateToken(user);
+    }
+
+    @Override
+    public User getUserDetailsFromToken(String token) throws Exception {
+        if (jwtTokenUtil.isTokenExpired(token)) {
+            throw new Exception("Token is expired");
+        }
+        String phoneNumber=jwtTokenUtil.extractPhoneNumber(token);
+        Optional<User> optionalUser=userRepository.findByPhoneNumber(phoneNumber);
+
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
+        }else {
+            throw new DataNotFountException("User not found");
+        }
     }
 }

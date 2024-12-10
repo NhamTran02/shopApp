@@ -2,6 +2,7 @@ package com.example.shopapp.controller;
 
 import com.example.shopapp.DTO.UserDTO;
 import com.example.shopapp.DTO.UserLoginDTO;
+import com.example.shopapp.Responses.UserResponse;
 import com.example.shopapp.model.User;
 import com.example.shopapp.services.UserService;
 import jakarta.validation.Valid;
@@ -50,13 +51,27 @@ public class UserController {
 //        SecretKey secretKey= Keys.secretKeyFor(SignatureAlgorithm.HS256);
 //        String encrypted= Encoders.BASE64.encode(secretKey.getEncoded());
 //        System.out.println(encrypted);
+
         //ktra thông tin đăng nhập và sinh token
         try {
-            String token = userService.login(userLoginDTO.getPhoneNumber(),userLoginDTO.getPassword());
+            String token = userService.login(userLoginDTO.getPhoneNumber(),
+                    userLoginDTO.getPassword());
             //Trả về token trong response
             return ResponseEntity.ok().body(token);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @PostMapping("/details")
+    public ResponseEntity<?> getUserDetails(@RequestHeader("Authorization") String token) {
+        try {
+            String extractedToken = token.substring(7);
+            User user=userService.getUserDetailsFromToken(extractedToken);
+            return ResponseEntity.ok(UserResponse.fromUser(user));
+
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

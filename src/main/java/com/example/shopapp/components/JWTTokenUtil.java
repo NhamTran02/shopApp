@@ -32,6 +32,7 @@ public class JWTTokenUtil {
     public String generateToken(User user) throws InvalidParamException {
         Map<String, Object> claims = new HashMap<>();
         claims.put("phoneNumber", user.getPhoneNumber());
+        claims.put("userId",user.getId());
         claims.put("roles", user.getAuthorities().stream()
         .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
