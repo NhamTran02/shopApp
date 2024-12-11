@@ -12,12 +12,15 @@ import com.example.shopapp.services.impl.UserServiceImpl;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -153,6 +156,13 @@ public class UserService implements UserServiceImpl {
 
         // Lưu user đã được cập nhật
         return userRepository.save(existingUser);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Override
+    public List<User> getAllUser(boolean active) {
+        List<User> users=userRepository.findAllActive(active);
+        return users;
     }
 
 }

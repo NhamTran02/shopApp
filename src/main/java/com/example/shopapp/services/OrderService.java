@@ -13,6 +13,8 @@ import com.example.shopapp.services.impl.OrderServiceImpl;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -35,9 +37,8 @@ public class OrderService implements OrderServiceImpl {
     private OrderDetailRepository orderDetailRepository;
 
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     @Override
-    @Transactional
     public Order createOrder(OrderDTO orderDTO) throws Exception {
         //tìm xem user_id có tồn tại kh
         User user =userRepository.findById(orderDTO.getUserId())
@@ -129,4 +130,5 @@ public class OrderService implements OrderServiceImpl {
     public List<Order> findByUserId(Long userId) {
         return orderRepository.findByUserId(userId);
     }
+
 }

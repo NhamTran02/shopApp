@@ -95,4 +95,9 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/active")
+    public ResponseEntity<?> getAllUsers(@RequestBody boolean active) {
+        return ResponseEntity.ok(userService.getAllUser(active));
+    }
 }

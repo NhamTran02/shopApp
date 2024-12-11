@@ -3,6 +3,8 @@ package com.example.shopapp.services.impl;
 import com.example.shopapp.DTO.OrderDTO;
 import com.example.shopapp.exceptions.DataNotFountException;
 import com.example.shopapp.model.Order;
+import org.hibernate.query.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
